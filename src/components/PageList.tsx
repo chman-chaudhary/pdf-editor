@@ -8,10 +8,11 @@ import {
 } from "react-beautiful-dnd";
 import { PageMetadata } from "@/types";
 import PDFPagePreview from "./PagePreview";
+import { Dispatch, SetStateAction } from "react";
 
 interface Props {
   pages: PageMetadata[];
-  setPages: (pages: PageMetadata[]) => void;
+  setPages: Dispatch<SetStateAction<PageMetadata[]>>;
 }
 
 const PageList: React.FC<Props> = ({ pages, setPages }) => {
@@ -23,6 +24,19 @@ const PageList: React.FC<Props> = ({ pages, setPages }) => {
     updatedPages.splice(result.destination.index, 0, movedPage);
 
     setPages(updatedPages);
+  };
+
+  const handleDeletePage = (targetPage: PageMetadata) => {
+    setPages((prevPages: PageMetadata[]) =>
+      prevPages.filter(
+        (p) =>
+          !(
+            p.pdfIndex === targetPage.pdfIndex &&
+            p.pageIndex === targetPage.pageIndex &&
+            p.originalPdfBytes === targetPage.originalPdfBytes
+          )
+      )
+    );
   };
 
   return (
@@ -53,7 +67,10 @@ const PageList: React.FC<Props> = ({ pages, setPages }) => {
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                   >
-                    <PDFPagePreview pageMeta={pageMeta} />
+                    <PDFPagePreview
+                      pageMeta={pageMeta}
+                      onDelete={handleDeletePage}
+                    />
                   </div>
                 )}
               </Draggable>

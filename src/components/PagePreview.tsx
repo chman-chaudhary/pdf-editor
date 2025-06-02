@@ -5,9 +5,13 @@ import { PageMetadata } from "@/types";
 
 interface PDFPagePreviewProps {
   pageMeta: PageMetadata;
+  onDelete: (targetPage: PageMetadata) => void;
 }
 
-const PDFPagePreview: React.FC<PDFPagePreviewProps> = ({ pageMeta }) => {
+const PDFPagePreview: React.FC<PDFPagePreviewProps> = ({
+  pageMeta,
+  onDelete,
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -55,8 +59,15 @@ const PDFPagePreview: React.FC<PDFPagePreviewProps> = ({ pageMeta }) => {
   }, [pageMeta]);
 
   return (
-    <div className="">
+    <div className="relative w-fit">
       <canvas ref={canvasRef} className="border rounded shadow" />
+      <button
+        onClick={() => onDelete?.(pageMeta)}
+        className="absolute top-2 right-2 bg-white rounded-full p-1 shadow hover:bg-red-100"
+        title="Delete page"
+      >
+        🗑️
+      </button>
       <p className="text-sm text-center mt-2 text-black">
         PDF {pageMeta.pdfIndex + 1}, Page {pageMeta.pageIndex + 1}
       </p>
