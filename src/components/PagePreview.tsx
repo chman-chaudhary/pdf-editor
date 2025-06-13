@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { MoreVertical } from "lucide-react";
+import { PDFRenderTask } from "pdfjs-dist/build/pdf";
 
 interface PDFPagePreviewProps {
   pageMeta: PageMetadata;
@@ -22,7 +23,7 @@ const PDFPagePreview: React.FC<PDFPagePreviewProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    let renderTask: pdfjsLib.PDFRenderTask | null = null;
+    let renderTask: PDFRenderTask | null = null;
     let cancelled = false;
 
     const loadPdf = async () => {
