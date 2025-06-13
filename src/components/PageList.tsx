@@ -6,16 +6,19 @@ import {
   Draggable,
   DropResult,
 } from "react-beautiful-dnd";
-import { PageMetadata } from "@/types";
 import PDFPagePreview from "./PagePreview";
-import { Dispatch, SetStateAction } from "react";
+import { usePDFContext } from "@/context/PDFContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-interface Props {
-  pages: PageMetadata[];
-  setPages: Dispatch<SetStateAction<PageMetadata[]>>;
-}
+const PageList = () => {
+  const { pages, setPages, handleDeletePage } = usePDFContext();
+  const router = useRouter();
 
-const PageList: React.FC<Props> = ({ pages, setPages }) => {
+  useEffect(() => {
+    if (pages.length === 0) router.push("/");
+  }, [pages.length, router]);
+
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
 
@@ -24,19 +27,6 @@ const PageList: React.FC<Props> = ({ pages, setPages }) => {
     updatedPages.splice(result.destination.index, 0, movedPage);
 
     setPages(updatedPages);
-  };
-
-  const handleDeletePage = (targetPage: PageMetadata) => {
-    setPages((prevPages: PageMetadata[]) =>
-      prevPages.filter(
-        (p) =>
-          !(
-            p.pdfIndex === targetPage.pdfIndex &&
-            p.pageIndex === targetPage.pageIndex &&
-            p.originalPdfBytes === targetPage.originalPdfBytes
-          )
-      )
-    );
   };
 
   return (
@@ -50,7 +40,7 @@ const PageList: React.FC<Props> = ({ pages, setPages }) => {
       >
         {(provided) => (
           <div
-            className="flex flex-wrap gap-4"
+            className="flex flex-wrap gap-4 p-8"
             ref={provided.innerRef}
             {...provided.droppableProps}
           >
@@ -62,7 +52,6 @@ const PageList: React.FC<Props> = ({ pages, setPages }) => {
               >
                 {(provided) => (
                   <div
-                    className="p-2 border rounded bg-white"
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}

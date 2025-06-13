@@ -2,6 +2,13 @@
 
 import { useEffect, useRef } from "react";
 import { PageMetadata } from "@/types";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { MoreVertical } from "lucide-react";
 
 interface PDFPagePreviewProps {
   pageMeta: PageMetadata;
@@ -30,7 +37,7 @@ const PDFPagePreview: React.FC<PDFPagePreviewProps> = ({
       if (cancelled) return;
 
       const page = await pdf.getPage(pageMeta.pageIndex + 1);
-      const viewport = page.getViewport({ scale: 0.5 });
+      const viewport = page.getViewport({ scale: 0.35 });
 
       const canvas = canvasRef.current;
       if (!canvas) return;
@@ -59,18 +66,28 @@ const PDFPagePreview: React.FC<PDFPagePreviewProps> = ({
   }, [pageMeta]);
 
   return (
-    <div className="relative w-fit">
-      <canvas ref={canvasRef} className="border rounded shadow" />
-      <button
-        onClick={() => onDelete?.(pageMeta)}
-        className="absolute top-2 right-2 bg-white rounded-full p-1 shadow hover:bg-red-100"
-        title="Delete page"
-      >
-        🗑️
-      </button>
-      <p className="text-sm text-center mt-2 text-black">
-        PDF {pageMeta.pdfIndex + 1}, Page {pageMeta.pageIndex + 1}
-      </p>
+    <div className="relative w-fit border shadow-lg focus-within:border-primary hover:border-primary rounded-sm overflow-hidden p-0">
+      <canvas ref={canvasRef} className="block w-full h-full m-0 p-0" />
+
+      {/* Footer with PDF name and menu */}
+      <div className="absolute bottom-0 left-0 w-full bg-white z-10 flex items-center justify-between px-4 py-3 border-t border-gray-400/60">
+        <p className="w-full text-sm text-gray-800 truncate font-semibold text-center overflow-hidden">
+          {pageMeta.pdfName} - {pageMeta.pageIndex + 1}
+        </p>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="p-1 rounded focus:outline-none">
+              <MoreVertical className="w-4 h-4" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem onClick={() => onDelete?.(pageMeta)}>
+              Remove
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
   );
 };
